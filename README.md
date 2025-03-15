@@ -1,4 +1,4 @@
-# EverQuest Player Logger - README
+# EverQuest Raid Log Taker - README
 
 This guide will help you set up and run the Python script that extracts player information from your EverQuest logs and saves it to a separate file.
 
@@ -66,11 +66,33 @@ This script:
 2. Select "Create shortcut"
 3. Move the shortcut to your desktop or somewhere easy to access
 
+Before Running the Script
+Step 1: Enable Logging in EverQuest
+
+Before the script can extract player information, you need to make sure EverQuest is saving logs:
+
+    Enable logging in one of these ways:
+
+        Edit your eqclient.ini file and set Log=TRUE
+
+        OR simply type /logs on in the game chat and press ENTER
+
+    Verify logging is enabled - you should see a message in-game confirming logs are on
+
+Step 2: Generate the Player List in EverQuest
+
+    While playing EverQuest, type /who guild and press ENTER
+
+    This command will write the list of guild members in your current zone to your log file
+
+    The script will extract this information when run
+
+
 ## Running the Script
 
 ### Method 1: Direct Double-Click
 
-1. Simply double-click the `eqlogger.py` file or its shortcut
+1. Simply double-click the `takelogs.py` file or its shortcut
 2. A command window will appear showing:
    - Information about the log file being processed
    - The number of players in your current zone
@@ -81,7 +103,7 @@ This script:
 
 1. Right-click in the folder where your script is located while holding Shift
 2. Select "Open command window here" or "Open PowerShell window here"
-3. Type `python eqlogger.py` and press Enter
+3. Type `python takelogs.py` and press Enter
 4. The script will run and show the same information as Method 1
 
 ## What to Expect When It Runs
