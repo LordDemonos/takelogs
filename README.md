@@ -66,7 +66,8 @@ This script:
 2. Select "Create shortcut"
 3. Move the shortcut to your desktop or somewhere easy to access
 
-Before Running the Script
+## Before Running the Script
+
 Step 1: Enable Logging in EverQuest
 
 Before the script can extract player information, you need to make sure EverQuest is saving logs:
