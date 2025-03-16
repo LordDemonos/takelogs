@@ -134,6 +134,61 @@ def countdown_exit():
         time.sleep(1)
     print("Goodbye!                    ")
 
+def is_block_from_today(block):
+    """
+    Check if the log block is from today.
+    
+    Returns:
+        tuple: (bool, str) - Whether the block is from today and the timestamp string
+    """
+    try:
+        lines = block.split('\n')
+        if not lines:
+            return False, "No lines found in block"
+        
+        # Extract timestamp from the first line
+        first_line = lines[0]
+        match = re.search(r'\[(.*?)\]', first_line)
+        
+        if not match:
+            return False, "No timestamp found in block"
+        
+        timestamp_str = match.group(1)
+        
+        # EverQuest logs typically use format like: [Wed Mar 16 20:45:30 2025]
+        # Try to parse this timestamp
+        try:
+            # Try multiple date formats since EQ logs can vary
+            for fmt in [
+                "%a %b %d %H:%M:%S %Y",  # Wed Mar 16 20:45:30 2025
+                "%a %b %d %H:%M:%S",     # Wed Mar 16 20:45:30 (no year)
+                "%m-%d-%Y %H:%M:%S"      # 03-16-2025 20:45:30
+            ]:
+                try:
+                    if "%Y" not in fmt:
+                        # If format doesn't include year, add current year
+                        current_year = datetime.now().year
+                        parsed_time = datetime.strptime(f"{timestamp_str} {current_year}", f"{fmt} %Y")
+                    else:
+                        parsed_time = datetime.strptime(timestamp_str, fmt)
+                    
+                    # Compare date part only
+                    today = datetime.now().date()
+                    log_date = parsed_time.date()
+                    
+                    return log_date == today, timestamp_str
+                except ValueError:
+                    continue
+            
+            # If we're here, none of the formats worked
+            return False, f"Could not parse timestamp: {timestamp_str}"
+            
+        except Exception as e:
+            return False, f"Error parsing timestamp: {e}"
+    
+    except Exception as e:
+        return False, f"Error checking block date: {e}"
+
 def main():
     log_file_path = 'D:\\TAKPv22HD\\eqlog_Xanax_pq.proj.txt'  # Update this path
     output_dir = 'E:\\FormerGlorySite\\Logs'  # Update this path
@@ -151,16 +206,29 @@ def main():
     block = extract_last_block(log_file_path)
     
     if block:
-        # Extract the player count for the filename
-        player_count = get_player_count(block)
+        # Check if the block is from today
+        is_today, timestamp = is_block_from_today(block)
         
-        # Generate a filename based on the current datetime and player count
-        now = datetime.now()
-        filename = now.strftime('%Y-%m-%d_%H-%M-%S') + f"_{player_count}-Players.txt"
-        output_file_path = os.path.join(output_dir, filename)
-        
-        save_block(block, output_file_path)
-        print(f"Saved block to {output_file_path}")
+        if is_today:
+            # Extract the player count for the filename
+            player_count = get_player_count(block)
+            
+            # Generate a filename based on the current datetime and player count
+            now = datetime.now()
+            filename = now.strftime('%Y-%m-%d_%H-%M-%S') + f"_{player_count}-Players.txt"
+            output_file_path = os.path.join(output_dir, filename)
+            
+            save_block(block, output_file_path)
+            print(f"Saved block to {output_file_path}")
+        else:
+            # Log and inform the user that the data is not from today
+            logging.warning(f"Found log block with timestamp [{timestamp}] is not from today. No file saved.")
+            print("\n=====================")
+            print("Results...")
+            print(f"Found player data from [{timestamp}] which is not from today.")
+            print("Please run '/who guild' in EverQuest to generate fresh data.")
+            print("Xanax loves you!!")
+            print("=====================\n")
     else:
         print("No player information found.")
     
