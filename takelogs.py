@@ -11,12 +11,6 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def extract_last_block(log_file_path):
     """
     Extracts the last block of player information from the log file.
-    
-    Parameters:
-    - log_file_path: Path to the log file.
-    
-    Returns:
-    - The last block of player information as a string.
     """
     try:
         logging.info(f"Attempting to read log file: {log_file_path}")
@@ -56,13 +50,53 @@ def extract_last_block(log_file_path):
         logging.error(f"Error extracting block: {e}")
         return ""
 
+def get_player_count(block):
+    """
+    Extract the player count from the block.
+    """
+    lines = block.split('\n')
+    if lines:
+        last_line = lines[-1]
+        match = re.search(r'There are (\d+) players', last_line)
+        if match:
+            return match.group(1)
+    return "unknown"
+
+def extract_player_names(block):
+    """
+    Extract just the player names from the block.
+    """
+    lines = block.split('\n')
+    player_names = []
+    
+    # Skip the header and footer lines
+    if len(lines) >= 3:
+        player_lines = lines[2:-1]  # Skip first two and last line
+        
+        for line in player_lines:
+            # Handle different formats
+            if 'AFK' in line and '[ANONYMOUS]' in line:
+                match = re.search(r'AFK\s+\[ANONYMOUS\]\s+(\w+)', line)
+                if match:
+                    player_names.append(match.group(1))
+            elif '[ANONYMOUS]' in line:
+                match = re.search(r'\[ANONYMOUS\]\s+(\w+)', line)
+                if match:
+                    player_names.append(match.group(1))
+            elif 'AFK' in line:
+                match = re.search(r'AFK\s+\[\d+.*?\]\s+(\w+)', line)
+                if match:
+                    player_names.append(match.group(1))
+            else:
+                match = re.search(r'\][\s]+(\w+)[\s]+\(', line)
+                if match:
+                    player_names.append(match.group(1))
+    
+    return player_names
+
 def save_block(block, output_file_path):
     """
     Saves the block to a file.
-    
-    Parameters:
-    - block: The block of text to save.
-    - output_file_path: Path to the output file.
     """
     try:
         logging.info(f"Saving block to file: {output_file_path}")
@@ -80,8 +114,12 @@ def save_block(block, output_file_path):
         else:
             logging.warning(f"No lines found in block saved to {output_file_path}")
         
+        # Extract just the player names
+        player_names = extract_player_names(block)
+        
+        # Write only the player names to the file
         with open(output_file_path, 'w') as file:
-            file.write(block)
+            file.write('\n'.join(player_names))
     
     except Exception as e:
         logging.error(f"Error saving block to file: {e}")
@@ -113,9 +151,12 @@ def main():
     block = extract_last_block(log_file_path)
     
     if block:
-        # Generate a filename based on the current datetime
+        # Extract the player count for the filename
+        player_count = get_player_count(block)
+        
+        # Generate a filename based on the current datetime and player count
         now = datetime.now()
-        filename = now.strftime('%Y-%m-%d_%H-%M-%S.txt')
+        filename = now.strftime('%Y-%m-%d_%H-%M-%S') + f"_{player_count}-Players.txt"
         output_file_path = os.path.join(output_dir, filename)
         
         save_block(block, output_file_path)
