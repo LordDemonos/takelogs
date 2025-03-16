@@ -2,12 +2,19 @@
 
 This guide will help you set up and run the Python script that extracts player information from your EverQuest logs and saves it to a separate file.
 
+## What's New in Version 1.1.0
+
+- Player Count in Filename: The script now includes the number of players in the filename (e.g., "2025-03-15_21-02-22_46-Players.txt")
+- Improved Log Format: Only includes the essential player information in the output file
+- Enhanced Visual Feedback: Displays the total number of players found during extraction
+- Optimized Processing: Better handling of log file formats and character data
+
 ## What This Script Does
 
 This script:
 - Reads your EverQuest log file
 - Finds the most recent player list (who's online)
-- Saves this information to a separate file with a timestamp
+- Saves this information to a separate file with a timestamp and player count
 - Shows you how many players are in your zone
 - Displays a cool "XANAX LOVES YOU!!" message
 - Automatically closes after 7 seconds
@@ -34,7 +41,7 @@ This script:
 
 1. Create a folder where you want to keep the script (e.g., `C:\LogsTaken`)
 2. Copy the Python script to this folder
-3. Rename the file to something easy to remember like `takelogs.py`
+3. Make sure the file is named `takelogs.py`
 
 ### Step 3: Edit the Script for Your Computer
 
@@ -68,26 +75,21 @@ This script:
 
 ## Before Running the Script
 
-Step 1: Enable Logging in EverQuest
+### Step 1: Enable Logging in EverQuest
 
 Before the script can extract player information, you need to make sure EverQuest is saving logs:
 
-    Enable logging in one of these ways:
+1. **Enable logging** in one of these ways:
+   - Edit your `eqclient.ini` file and set `Log=TRUE`
+   - OR simply type `/logs on` in the game chat and press ENTER
 
-        Edit your eqclient.ini file and set Log=TRUE
+2. **Verify logging is enabled** - you should see a message in-game confirming logs are on
 
-        OR simply type /logs on in the game chat and press ENTER
+### Step 2: Generate the Player List in EverQuest
 
-    Verify logging is enabled - you should see a message in-game confirming logs are on
-
-Step 2: Generate the Player List in EverQuest
-
-    While playing EverQuest, type /who guild and press ENTER
-
-    This command will write the list of guild members in your current zone to your log file
-
-    The script will extract this information when run
-
+1. While playing EverQuest, type `/who guild` and press ENTER
+2. This command will write the list of guild members in your current zone to your log file
+3. The script will extract this information when run
 
 ## Running the Script
 
@@ -116,6 +118,11 @@ When the script runs successfully:
 4. The "XANAX LOVES YOU!!" ASCII art will display
 5. The window will show where the log was saved
 6. A 7-second countdown will begin before the window closes
+
+## Output Files
+
+The script creates files with the following naming convention:
+- `YYYY-MM-DD_HH-MM-SS_XX-Players.txt` where XX is the number of players found
 
 ## Troubleshooting
 
